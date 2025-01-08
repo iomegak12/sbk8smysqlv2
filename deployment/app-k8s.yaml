@@ -1,0 +1,88 @@
+---
+apiVersion: v1
+kind: List
+items:
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app: sbk8smysql
+        version: 6.0.0
+      name: sbk8smysql
+    spec:
+      ports:
+        - name: http
+          port: 8080
+          protocol: TCP
+          targetPort: 8080
+          nodePort: 31371
+      type: NodePort
+      selector:
+        app: sbk8smysql
+  - apiVersion: v1
+    kind: ServiceAccount
+    metadata:
+      name: sbk8smysql
+      labels:
+        account: sbk8smysql
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        app: sbk8smysql
+        version: 6.0.0
+      name: sbk8smysql
+    spec:
+      selector:
+        matchLabels:
+          app: sbk8smysql
+      template:
+        metadata:
+          labels:
+            app: sbk8smysql
+            version: 6.0.0
+        spec:
+          serviceAccountName: sbk8smysql
+          containers:
+            - name: sbk8smysql
+              image: iomega/sbk8smysql
+              imagePullPolicy: IfNotPresent
+              resources:
+                limits:
+                  memory: "1Gi"
+                  cpu: "1"
+                requests:
+                  memory: "100Mi"
+                  cpu: "100m"
+              ports:
+                - containerPort: 8080
+                  name: http
+                  protocol: TCP
+              env:
+                - name: SPRING_PROFILES_ACTIVE
+                  value: k8s
+                - name: SPRING_DATASOURCE_URL
+                  valueFrom:
+                    configMapKeyRef:
+                      name: mysql-config
+                      key: MYSQL_DATABASE_URL
+                - name: SPRING_DATASOURCE_USERNAME
+                  valueFrom:
+                    secretKeyRef:
+                      name: mysql-secret
+                      key: MYSQL_USER
+                - name: SPRING_DATASOURCE_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: mysql-secret
+                      key: MYSQL_PASSWORD
+              securityContext:
+                # runAsUser: 1000
+                # readOnlyRootFilesystem: true
+                allowPrivilegeEscalation: false
+              livenessProbe:
+                httpGet:
+                  path: /api/v1/actuator/health
+                  port: 8080
+                initialDelaySeconds: 15
+                periodSeconds: 5
