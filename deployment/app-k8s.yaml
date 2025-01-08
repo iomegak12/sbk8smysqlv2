@@ -61,21 +61,18 @@ items:
               env:
                 - name: SPRING_PROFILES_ACTIVE
                   value: k8s
-                - name: SPRING_DATASOURCE_URL
+                - name: DATASOURCE_URL
                   valueFrom:
                     configMapKeyRef:
                       name: mysql-config
                       key: MYSQL_DATABASE_URL
-                - name: SPRING_DATASOURCE_USERNAME
+                - name: DATASOURCE_USERNAME
+                  value: root
+                - name: DATASOURCE_PASSWORD
                   valueFrom:
                     secretKeyRef:
                       name: mysql-secret
-                      key: MYSQL_USER
-                - name: SPRING_DATASOURCE_PASSWORD
-                  valueFrom:
-                    secretKeyRef:
-                      name: mysql-secret
-                      key: MYSQL_PASSWORD
+                      key: MYSQL_ROOT_PASSWORD
               securityContext:
                 # runAsUser: 1000
                 # readOnlyRootFilesystem: true
