@@ -5,7 +5,7 @@ metadata:
   labels:
     app: mysql
 spec:
-  #  type: NodePort
+  type: ClusterIP
   ports:
     - port: 3306
   #      nodePort: 31000
@@ -41,7 +41,7 @@ spec:
         app: mysql
     spec:
       containers:
-        - image: mysql:8
+        - image: mysql
           name: mysql
           resources:
             limits:

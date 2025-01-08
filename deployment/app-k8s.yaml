@@ -16,7 +16,7 @@ items:
           protocol: TCP
           targetPort: 8080
           nodePort: 31371
-      type: NodePort
+      type: LoadBalancer
       selector:
         app: sbk8smysql
   - apiVersion: v1
@@ -45,7 +45,7 @@ items:
           serviceAccountName: sbk8smysql
           containers:
             - name: sbk8smysql
-              image: iomega/sbk8smysql
+              image: iomega/bravurak8sweb
               imagePullPolicy: IfNotPresent
               resources:
                 limits:
